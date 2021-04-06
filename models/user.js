@@ -14,7 +14,7 @@ const UserSchema = new Schema({
         required: true,
         minlength: 8,
     },
-    profilePicture: {
+    profilePic: {
         type: String,
         default: "https://i.imgur.com/4DDqtypt.jpg",
     },

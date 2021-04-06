@@ -22,6 +22,7 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/trakmyproject",
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
+    useCreateIndex: true // resolve 'collection.ensureIndex is deprecated. Use createIndexes instead. error message'
 });
 
 // User Routes
