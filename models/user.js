@@ -35,7 +35,10 @@ const UserSchema = new Schema({
     //     type: Schema.Types.ObjectId,
     //     ref: "UserComments"
     // }],
-    dateCreated: { type: Date, default: Date.now }
+    dateCreated: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 UserSchema.pre("save", function (next) { // 
