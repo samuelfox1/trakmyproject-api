@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const bcrypt = require("bcrypt");
 
+
 const UserSchema = new Schema({
     username: {
         type: String,
@@ -15,15 +16,26 @@ const UserSchema = new Schema({
     },
     profilePicture: {
         type: String,
-        default: "https://i.imgur.com/owu9ukE.jpeg",
+        default: "https://i.imgur.com/4DDqtypt.jpg",
     },
-    projects: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Session",
-        },
-    ],
-    date: { type: Date, default: Date.now },
+    name: {
+        first: { type: String },
+        last: { type: String },
+    },
+    email: { type: String },
+    projects: [{
+        type: Schema.Types.ObjectId,
+        ref: "Project"
+    }],
+    // friends: [{
+    //     type: Schema.Types.ObjectId,
+    //     ref: "User"
+    // }],
+    // comments: [{
+    //     type: Schema.Types.ObjectId,
+    //     ref: "UserComments"
+    // }],
+    dateCreated: { type: Date, default: Date.now }
 });
 
 UserSchema.pre("save", function (next) { // 
@@ -48,5 +60,4 @@ UserSchema.pre("save", function (next) { //
 });
 
 const User = mongoose.model("User", UserSchema);
-
 module.exports = User;
