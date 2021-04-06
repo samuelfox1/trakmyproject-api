@@ -27,16 +27,13 @@ const authenticateMe = (req) => {
 router.post("/api/signup", (req, res) => {
     db.User.create(req.body)
         .then((user) => {
-            console.log("newUser", user);
             const token = jwt.sign(
                 {
                     username: user.username,
                     id: user._id,
                 },
                 process.env.PRIVATEKEY,
-                {
-                    expiresIn: "2h",
-                }
+                { expiresIn: "2h" }
             );
             res.json({ user: user, token: token });
         })
@@ -47,7 +44,7 @@ router.post("/api/signup", (req, res) => {
 
 
 router.post("/api/login", (req, res) => {
-    db.User.findOne({ username: req.body.username })
+    db.User.findOne({ username: req.body.username }).populate("projects")
         .then((user) => {
             if (user && bcrypt.compareSync(req.body.password, user.password)) { // if a user is found and hashed passwords match
                 const token = jwt.sign(

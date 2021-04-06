@@ -29,6 +29,10 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/trakmyproject",
 const userRoutes = require("./controllers/user");
 app.use(userRoutes);
 
+// Project Routes
+const projectRoutes = require("./controllers/project");
+app.use(projectRoutes)
+
 
 
 // Server

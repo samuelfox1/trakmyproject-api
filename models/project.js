@@ -2,6 +2,10 @@ const mongoose = require("mongoose")
 const { Schema } = mongoose
 
 const ProjectSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+    },
     admin: { // owner of the project
         type: Schema.Types.ObjectId,
         ref: "User"
@@ -10,7 +14,6 @@ const ProjectSchema = new Schema({
     //     type: Schema.Types.ObjectId,
     //     ref: "User"
     // }],
-    name: { type: String },
     privacy: {
         friends: { type: Boolean },
         public: { type: Boolean },
