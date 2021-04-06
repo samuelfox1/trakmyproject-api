@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+const { Schema } = mongoose
 
 const ProjectSchema = new Schema({
     admin: { // owner of the project
@@ -21,10 +21,10 @@ const ProjectSchema = new Schema({
         type: Array,
         default: []
     },
-    comments: {
-        type: Array,
-        default: []
-    },
+    // comments: {
+    //     type: Array,
+    //     default: []
+    // },
     dateCreated: {
         type: Date,
         default: Date.now
@@ -35,6 +35,5 @@ const ProjectSchema = new Schema({
     }
 });
 
-const Projects = mongoose.model("Projects", ProjectSchema)
-
-module.exports = Projects
+const Project = mongoose.model("Project", ProjectSchema)
+module.exports = Project;
