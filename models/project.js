@@ -14,10 +14,7 @@ const ProjectSchema = new Schema({
     //     type: Schema.Types.ObjectId,
     //     ref: "User"
     // }],
-    privacy: {
-        friends: { type: Boolean },
-        public: { type: Boolean },
-    },
+    public: { type: Boolean },
     gitHubRepo: { type: String },
     description: { type: String },
     entries: { // entries for each project
