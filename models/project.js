@@ -6,7 +6,7 @@ const ProjectSchema = new Schema({
         type: String,
         required: true,
     },
-    admin: { // owner of the project
+    admin_id: { // owner of the project
         type: Schema.Types.ObjectId,
         ref: "User"
     },
