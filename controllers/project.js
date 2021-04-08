@@ -33,16 +33,17 @@ router.put('/api/project', (req, res) => {
 
 router.delete('/api/project', async (req, res) => {
     const rb = req.body
-    const projectToDelete = await findProjectToDelete(rb)
-    if (!projectToDelete) res.status(500).json('invalid id to delete')
-    if (projectToDelete.admin != rb.user_id) res.status(500).json('not authorized to delete')
-    else {
-        const updatedProjectsArr = await getUpdatedProjectsArr(rb)
-        const updated = await updateAdminsProjects(rb, updatedProjectsArr)
-        const deleted = await deleteProject(rb)
-        if (updated && deleted) res.json({ message: 'delete success', updatedProjects: updated.projects })
-        else res.status(500).json('delete failure')
-    }
+
+    const projectToDelete = await findProjectToDelete(rb) // find project data
+    if (!projectToDelete) res.status(500).json('invalid id to delete') // if no data, invalid id was entered
+    if (projectToDelete.admin != rb.user_id) res.status(500).json('not authorized to delete') // if the user id does not match the admin id for the project
+
+    const updatedProjectsArr = await getUpdatedProjectsArr(rb)
+    const updated = await updateAdminsProjects(rb, updatedProjectsArr)
+    const deleted = await deleteProject(rb)
+
+    if (updated && deleted) res.json({ message: 'delete success', updatedProjects: updated.projects })
+    else res.status(500).json('delete failure')
 
     function findProjectToDelete(rb) {
         return new Promise((resolve, reject) => {
