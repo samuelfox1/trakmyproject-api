@@ -2,6 +2,7 @@ const router = require("express").Router();
 const db = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { default: axios } = require("axios");
 require("dotenv").config();
 
 const authenticateMe = (req) => {
@@ -82,6 +83,16 @@ router.get("/", (req, res) => {
     } else {
         res.status(403).send("authorization failed");
     }
+
 });
+
+router.get('/api/github', (req, res) => {
+    const url = 'https://api.github.com'
+    // const url = 'https://api.github.com/rate_limit'
+    // const url = "https://randomuser.me/api/?results=50"
+    axios.get(url)
+        .then(data => res.json(data.data))
+        .catch(err => res.status(500).json(err))
+})
 
 module.exports = router;
