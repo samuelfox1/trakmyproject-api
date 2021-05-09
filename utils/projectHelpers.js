@@ -1,6 +1,14 @@
 const db = require("../models");
 
 
+const createProject = (rb) => {
+    return new Promise((resolve, reject) => {
+        db.Project.create(rb)
+            .then(entry => resolve(entry))
+            .catch(() => reject(null))
+    })
+}
+
 const findProjectToEdit = (rb) => {
     //  input: object that has key 'project_id'
     // action: find the project for the id 
@@ -11,7 +19,6 @@ const findProjectToEdit = (rb) => {
             .catch(() => reject({ admin: null }))
     })
 }
-
 
 const findProjectKeysToUpdate = (rb) => {
     // find keys attached to req.body and update project with the new values
@@ -62,6 +69,7 @@ const deleteProject = (rb) => {
 }
 
 module.exports = {
+    createProject,
     findProjectToEdit,
     findProjectKeysToUpdate,
     updateProjectData,

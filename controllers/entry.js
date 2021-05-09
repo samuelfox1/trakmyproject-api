@@ -4,8 +4,8 @@ const db = require("../models");
 const { findById } = require("../models/user");
 const { authenticateUser, checkPassword, generateNewToken } = require('../utils/authentication')
 const { findProjectToEdit, findProjectKeysToUpdate, updateProjectData, addEntryToProject, deleteProject } = require('../utils/projectHelpers')
-const { getUsersUpdatedProjectsArr, updateUserData } = require('../utils/userHelpers')
-
+const { getUsersUpdatedProjectsArr, addProjectToUser } = require('../utils/userHelpers')
+const { createEntry, findEntryToEdit } = require('../utils/entryHelpers')
 
 
 router.post('/api/entry', async (req, res) => {
@@ -15,9 +15,9 @@ router.post('/api/entry', async (req, res) => {
     //     return
     // }
     const rb = req.body
-    const entry = await db.Entry.create(rb)
-        .then(data => data)
-        .catch(() => null)
+    rb.admin_id = rb.user_id // add admin_id property as user_id that created it
+
+    const entry = await createEntry(rb)
     if (!entry) {
         res.status(500).json('error, entry not created')
         return
@@ -28,6 +28,32 @@ router.post('/api/entry', async (req, res) => {
         return
     }
     res.json(entry)
+})
+
+router.put('/api/entry', async (req, res) => {
+    // const authenticated = authenticateUser(req) //must pass in full req to access body and headers
+    // if (!authenticated) {
+    //     res.status(403).json(`User doesn't have enough privilege`)
+    //     return
+    // }
+    const rb = req.body
+    const entryToEdit = await findEntryToEdit(rb)
+
+    if (!entryToEdit) {
+        res.status(500).json('error, no project found')
+        return
+    }
+    if (projectToEdit.admin_id != rb.user_id) {
+        res.status(500).json('Not authorized to edit this project')
+        return
+    }
+    const updatedProject = await updateProjectData(rb)
+    if (!updatedProject) {
+        res.status(500).json('Project failed to update')
+        return
+    }
+    res.json(updatedProject)
+
 })
 
 

@@ -2,54 +2,53 @@ const router = require("express").Router();
 const db = require("../models");
 const { default: axios } = require('axios');
 const { authenticateUser, checkPassword, generateNewToken } = require('../utils/authentication')
+const { createUser, getUsersData } = require('../utils/userHelpers')
 require('dotenv').config();
 
 
 
 
 router.post('/api/signup', (req, res) => {
-    db.User.create(req.body)
-        .then((user) => {
-            const token = generateNewToken(user)
-            res.json({ user: user, token: token });
+    const rb = req.body
+    const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, rb))
+    creatNewUser
+        .then(newUser => {
+            const token = generateNewToken(newUser)
+            res.json({ user: newUser, token: token });
         })
-        .catch((err) => { res.status(500).json(err) });
+        .catch(err => res.status(500).json(err))
 });
 
 
 router.post('/api/login', (req, res) => {
     const rb = req.body
     db.User.findOne({ username: rb.username })
-        .populate('projects')
-        .then((user) => {
+        .then(user => {
             const validUser = checkPassword(rb, user)
-            if (!validUser) {
-                res.json({ err: 'invalid username or password' });
+            if (validUser) {
+                res.json(validUser);
                 return
             }
-            res.json(validUser);
+            res.json({ err: 'invalid username or password' });
         })
-        .catch((err) => { res.status(500).json(err) });
+        .catch(err => { res.status(500).json(err) });
 });
 
-router.put('')
+router.put('/api/user', (req, res) => {
+    res.json('route not available yet')
+})
 
 // Autenticate user login information and populate homepage with user data
-router.get('/api/user', (req, res) => {
-    const verifiedToken = authenticateUser(req);
-
-    // if token is verified, find the user that matches id from token and
-    if (verifiedToken) {
-        db.User.findOne({ _id: verifiedToken.id })
-            .populate('projects')
-            .then((user) => {
-                const token = req.headers.authorization.split(" ")[1];
-                res.json({ user, token });
-            })
-            .catch((err) => { res.status(500).json(err) });
-        return
+router.get('/api/user', async (req, res) => {
+    const authorizedUser = authenticateUser(req);
+    if (authorizedUser) {
+        const userObj = await getUsersData(req, authorizedUser)
+        if (userObj) {
+            res.json(userObj)
+            return
+        }
     }
-    res.status(403).send('authorization failed');
+    res.status(500).json('authorization failed, user is logged out')
 });
 
 router.get('/api/github', (req, res) => {

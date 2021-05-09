@@ -10,10 +10,7 @@ const authenticateUser = (req) => {
     */
     if (!req.headers || !req.headers.authorization) return null  // no header or authorization in header
     const token = req.headers.authorization.split(" ")[1]  // update token to the Bearer value
-    const data = jwt.verify(token, process.env.PRIVATEKEY, (err, data) => {
-        if (err) return null
-        return data
-    });
+    const data = jwt.verify(token, process.env.PRIVATEKEY, (err, data) => err ? null : data);
     return data ? data : null;
 };
 

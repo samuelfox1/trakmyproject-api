@@ -1,8 +1,14 @@
 const router = require("express").Router();
 const db = require("../models");
 const { authenticateUser } = require('../utils/authentication')
-const { findProjectToEdit, findProjectKeysToUpdate, updateProjectData, deleteProject } = require('../utils/projectHelpers')
-const { getUsersUpdatedProjectsArr, updateUserData } = require('../utils/userHelpers')
+const { getUsersUpdatedProjectsArr, addProjectToUser } = require('../utils/userHelpers')
+const {
+    createProject,
+    findProjectToEdit,
+    findProjectKeysToUpdate,
+    updateProjectData,
+    deleteProject
+} = require('../utils/projectHelpers')
 
 
 router.post('/api/project', async (req, res) => {
@@ -11,26 +17,18 @@ router.post('/api/project', async (req, res) => {
     //     res.status(403).json(`User doesn't have enough privilege`)
     //     return
     // }
-
     const rb = req.body
     rb.admin_id = rb.user_id // add admin_id property as user_id that created it
-    const project = await db.Project.create(rb)
-        .then(p => p)
-        .catch(() => null)
-
+    const project = await createProject(rb)
     if (!project) {
         res.status(500).json('error, project not created')
         return
     }
-
-    const instructions = { $addToSet: { projects: project._id } }
-    const updated = await updateUserData(rb, instructions)
-
+    const updated = await addProjectToUser(rb, project._id)
     if (!updated) {
         res.status(500).json('error, user data not updated')
         return
     }
-
     res.json(project)
 })
 
@@ -80,7 +78,7 @@ router.delete('/api/project', async (req, res) => {
 
     const updatedProjectsArr = await getUsersUpdatedProjectsArr(rb)
     const instructions = { $set: { projects: updatedProjectsArr } }
-    const updated = await updateUserData(rb, instructions)
+    const updated = await addProjectToUser(rb, instructions)
     if (!updated) {
         res.status(500).json('error: project not deleted from user')
         return

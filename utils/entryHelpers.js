@@ -1,5 +1,13 @@
 const db = require("../models");
 
+const createEntry = (rb) => {
+    return new Promise((resolve, reject) => {
+        db.Entry.create(rb)
+            .then(entry => resolve(entry))
+            .catch(() => reject(null))
+    })
+}
+
 const findEntryToEdit = (rb) => {
     //  input: object that has key 'project_id'
     // action: find the project for the id 
@@ -19,7 +27,13 @@ const findEntryKeysToUpdate = (rb) => {
     return entryObj
 }
 
+// const addImage
+// const removeImage
+
+
+
 
 module.exports = {
-    updateProjectEntriesArr
+    createEntry,
+    findEntryToEdit
 }

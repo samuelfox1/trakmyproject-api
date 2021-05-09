@@ -6,6 +6,10 @@ const EntrySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Project"
     },
+    admin_id: { // owner of the project
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
     title: { type: String },
     body: { type: String },
     images: {
