@@ -1,15 +1,15 @@
 const db = require("../models");
 
 
-const isUserNameAvailable = () => {
-
-}
-
 
 const createUser = (resolve, reject, rb) => {
     db.User.create(rb)
         .then(newUser => resolve(newUser))
         .catch((err) => reject(err))
+}
+
+const loginAttempt = (resolve, reject, rb) => {
+
 }
 
 const getUsersData = (req, authenticatedUser) => {

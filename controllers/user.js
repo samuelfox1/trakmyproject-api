@@ -9,8 +9,7 @@ require('dotenv').config();
 
 
 router.post('/api/signup', (req, res) => {
-    const rb = req.body
-    const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, rb))
+    const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, req.body))
     creatNewUser
         .then(newUser => {
             const token = generateNewToken(newUser)
