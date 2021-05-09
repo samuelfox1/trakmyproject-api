@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const { Schema } = mongoose
 
 const EntrySchema = new Schema({
-    projectId: {
+    project_id: {
         type: Schema.Types.ObjectId,
         ref: "Project"
     },

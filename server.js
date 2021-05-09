@@ -33,6 +33,9 @@ app.use(userRoutes);
 const projectRoutes = require("./controllers/project");
 app.use(projectRoutes)
 
+// Entry Routes 
+const entryRoutes = require("./controllers/entry")
+app.use(entryRoutes)
 
 
 // Server
