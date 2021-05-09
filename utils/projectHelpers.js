@@ -19,7 +19,7 @@ const getUsersUpdatedProjectsArr = (rb) => {
     return new Promise((resolve, reject) => {
         db.User.findById(rb.user_id)
             .then(u => {
-                const updatedProjectsArray = u.projects.filter(p => p._id != rb.project_id)
+                const updatedProjectsArray = u.projects.filter(project => project._id != rb.project_id)
                 resolve(updatedProjectsArray)
             })
             .catch(() => reject(null))
@@ -39,7 +39,7 @@ const updateUserData = (rb, instructions) => {
     })
 }
 
-const updateProjectData = (rb) => {
+const findProjectKeysToUpdate = (rb) => {
     // find keys attached to req.body and update project with the new values
     const projectObj = { lastEdited: Date() }
     if (rb.title) projectObj.title = rb.title
@@ -64,6 +64,6 @@ module.exports = {
     findProjectToEdit,
     getUsersUpdatedProjectsArr,
     updateUserData,
-    updateProjectData,
+    findProjectKeysToUpdate,
     deleteProject
 }

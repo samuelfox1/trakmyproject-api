@@ -1,13 +1,13 @@
 const router = require("express").Router();
 const db = require("../models");
-const { default: axios } = require("axios");
+const { default: axios } = require('axios');
 const { authenticateUser, checkPassword, generateNewToken } = require('../utils/authentication')
-require("dotenv").config();
+require('dotenv').config();
 
 
 
 
-router.post("/api/signup", (req, res) => {
+router.post('/api/signup', (req, res) => {
     db.User.create(req.body)
         .then((user) => {
             const token = generateNewToken(user)
@@ -17,14 +17,14 @@ router.post("/api/signup", (req, res) => {
 });
 
 
-router.post("/api/login", (req, res) => {
+router.post('/api/login', (req, res) => {
     const rb = req.body
     db.User.findOne({ username: rb.username })
-        .populate("projects")
+        .populate('projects')
         .then((user) => {
             const validUser = checkPassword(rb, user)
             if (!validUser) {
-                res.json({ err: "invalid username or password" });
+                res.json({ err: 'invalid username or password' });
                 return
             }
             res.json(validUser);
@@ -32,14 +32,16 @@ router.post("/api/login", (req, res) => {
         .catch((err) => { res.status(500).json(err) });
 });
 
+router.put('')
+
 // Autenticate user login information and populate homepage with user data
-router.get("/", (req, res) => {
+router.get('/', (req, res) => {
     const verifiedToken = authenticateUser(req);
 
     // if token is verified, find the user that matches id from token and
     if (verifiedToken) {
         db.User.findOne({ _id: verifiedToken.id })
-            .populate("projects")
+            .populate('projects')
             .then((user) => {
                 const token = req.headers.authorization.split(" ")[1];
                 res.json({ user, token });
@@ -47,7 +49,7 @@ router.get("/", (req, res) => {
             .catch((err) => { res.status(500).json(err) });
         return
     }
-    res.status(403).send("authorization failed");
+    res.status(403).send('authorization failed');
 });
 
 router.get('/api/github', (req, res) => {

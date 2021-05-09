@@ -6,9 +6,9 @@ const {
     findProjectToEdit,
     getUsersUpdatedProjectsArr,
     updateUserData,
-    updateProjectData,
+    findProjectKeysToUpdate,
     deleteProject
-} = require('../utils/crudHelpers')
+} = require('../utils/projectHelpers')
 
 
 router.post('/api/project', async (req, res) => {
@@ -59,7 +59,7 @@ router.put('/api/project', async (req, res) => {
         return
     }
 
-    const updatedProjectObj = updateProjectData(rb)
+    const updatedProjectObj = findProjectKeysToUpdate(rb)
 
     db.Project.findByIdAndUpdate(rb.project_id, updatedProjectObj, { new: true })
         .then(data => res.json(data))
