@@ -35,7 +35,7 @@ router.post('/api/login', (req, res) => {
 router.put('')
 
 // Autenticate user login information and populate homepage with user data
-router.get('/', (req, res) => {
+router.get('/api/user', (req, res) => {
     const verifiedToken = authenticateUser(req);
 
     // if token is verified, find the user that matches id from token and

@@ -1,15 +1,10 @@
 const router = require("express").Router();
+const { Entry } = require("../models");
 const db = require("../models");
 const { findById } = require("../models/user");
 const { authenticateUser, checkPassword, generateNewToken } = require('../utils/authentication')
-
-const {
-    findProjectToEdit,
-    getUsersUpdatedProjectsArr,
-    updateUserData,
-    findProjectKeysToUpdate,
-    deleteProject
-} = require('../utils/projectHelpers')
+const { findProjectToEdit, findProjectKeysToUpdate, updateProjectData, addEntryToProject, deleteProject } = require('../utils/projectHelpers')
+const { getUsersUpdatedProjectsArr, updateUserData } = require('../utils/userHelpers')
 
 
 
@@ -20,13 +15,19 @@ router.post('/api/entry', async (req, res) => {
     //     return
     // }
     const rb = req.body
-    const project = await findProjectToEdit(rb)
-    db.Entry.create(rb)
-        .then(data => res.json(data))
-        .err(err => res.status(500).json(err))
-
-
-    // res.json(project)
+    const entry = await db.Entry.create(rb)
+        .then(data => data)
+        .catch(() => null)
+    if (!entry) {
+        res.status(500).json('error, entry not created')
+        return
+    }
+    const updated = await addEntryToProject(rb, entry._id)
+    if (!updated) {
+        res.status(500).json('error, project data not updated')
+        return
+    }
+    res.json(entry)
 })
 
 

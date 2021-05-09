@@ -19,7 +19,8 @@ const ProjectSchema = new Schema({
     description: { type: String },
     entries: { // entries for each project
         type: Array,
-        default: []
+        default: [],
+        ref: "Entry"
     },
     // comments: {
     //     type: Array,

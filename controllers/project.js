@@ -1,14 +1,8 @@
 const router = require("express").Router();
 const db = require("../models");
 const { authenticateUser } = require('../utils/authentication')
-
-const {
-    findProjectToEdit,
-    getUsersUpdatedProjectsArr,
-    updateUserData,
-    findProjectKeysToUpdate,
-    deleteProject
-} = require('../utils/projectHelpers')
+const { findProjectToEdit, findProjectKeysToUpdate, updateProjectData, deleteProject } = require('../utils/projectHelpers')
+const { getUsersUpdatedProjectsArr, updateUserData } = require('../utils/userHelpers')
 
 
 router.post('/api/project', async (req, res) => {
@@ -21,8 +15,8 @@ router.post('/api/project', async (req, res) => {
     const rb = req.body
     rb.admin_id = rb.user_id // add admin_id property as user_id that created it
     const project = await db.Project.create(rb)
-        .then(p => { return p })
-        .catch(() => { return null })
+        .then(p => p)
+        .catch(() => null)
 
     if (!project) {
         res.status(500).json('error, project not created')
@@ -53,18 +47,16 @@ router.put('/api/project', async (req, res) => {
         res.status(500).json('error, no project found')
         return
     }
-
     if (projectToEdit.admin_id != rb.user_id) {
         res.status(500).json('Not authorized to edit this project')
         return
     }
-
-    const updatedProjectObj = findProjectKeysToUpdate(rb)
-
-    db.Project.findByIdAndUpdate(rb.project_id, updatedProjectObj, { new: true })
-        .then(data => res.json(data))
-        .catch(err => res.status(500).json(err)
-        )
+    const updatedProject = await updateProjectData(rb)
+    if (!updatedProject) {
+        res.status(500).json('Project failed to update')
+        return
+    }
+    res.json(updatedProject)
 })
 
 router.delete('/api/project', async (req, res) => {
@@ -93,7 +85,6 @@ router.delete('/api/project', async (req, res) => {
         res.status(500).json('error: project not deleted from user')
         return
     }
-
     const deleted = await deleteProject(rb)
     if (!deleted) {
         res.status(500).json('error: project not deleted from collection')
@@ -105,6 +96,15 @@ router.delete('/api/project', async (req, res) => {
         updatedProjects: updated.projects
     }
     res.json(response)
+})
+
+
+router.get('/api/project', (req, res) => {
+    const rb = req.body
+    db.Project.findOne({ _id: rb.project_id })
+        .populate('entries')
+        .then(project => res.json(project))
+        .catch(err => res.statrus(500).json(err))
 })
 
 module.exports = router
