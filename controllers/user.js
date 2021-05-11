@@ -1,6 +1,4 @@
 const router = require("express").Router();
-const db = require("../models");
-const { default: axios } = require('axios');
 const { authenticateUser, checkPassword, generateNewToken } = require('../utils/authentication')
 const {
     createUser,
@@ -11,16 +9,16 @@ const {
     updatePassword,
     deleteUser,
 } = require('../utils/userHelpers')
-require('dotenv').config();
+const { respondWithError,
+    usernameUnavailable,
+    unauthorized,
+    forbidden,
+    expiredToken,
+    serverError,
+    notFound
+} = require('../utils/statusCodes')
 
-const respondWithError = (res, code, message) => res.status(code).json(message)
-const unauthorized = 'unauthenticated, incorrect username or password' // 401
-const forbidden = 'The client does not have access rights to the content' // 403
-const serverError = 'internal server error' // 500
-const notFound = 'not found' // 404
-const usernameUnavailable = 'username already in use' // 418
-
-
+// ------------------- POST ----------------------
 router.post('/api/signup', (req, res) => {
     const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, req.body))
     creatNewUser
@@ -38,6 +36,7 @@ router.post('/api/login', (req, res) => {
         .catch(() => respondWithError(res, 500, serverError))
 });
 
+// -------------------- GET ----------------------
 router.get('/api/user', (req, res) => {
     const authorizedUser = authenticateUser(req);
     if (!authorizedUser) return respondWithError(res, 401, unauthorized)
@@ -47,9 +46,9 @@ router.get('/api/user', (req, res) => {
         .catch(err => res.status(500).json(err))
 });
 
+// -------------------- PUT ----------------------
 router.put('/api/user/data', (req, res) => {
     if (!authenticateUser(req)) return respondWithError(res, 401, unauthorized)
-
     const updateUser = new Promise((resolve, reject) => updateUserData(resolve, reject, req.body))
     updateUser
         .then(data => res.json(data))
@@ -62,13 +61,11 @@ router.put('/api/user/username', (req, res) => {
     const updated = new Promise((resolve, reject) => updateUsername(resolve, reject, rb))
     updated
         .then(data => res.json(data))
-        .catch(err => err.keyValue?.username
-            ? respondWithError(res, 418, `${err.keyValue.username} already taken`)
-            : respondWithError(res, 418, err))
+        .catch(err => respondWithError(res, 418, usernameUnavailable(err)))
 })
 
 router.put('/api/user/password', (req, res) => {
-    if (!authenticateUser(req)) return respondWithError(res, 401, unauthorized)
+    if (!authenticateUser(req)) return respondWithError(res, 403, unauthorized)
     const rb = req.body
     const user = new Promise((resolve, reject) => findUserById(resolve, reject, req.body))
     user
@@ -83,6 +80,7 @@ router.put('/api/user/password', (req, res) => {
         .catch(() => respondWithError(res, 404, notFound))
 })
 
+// ------------------- DELETE --------------------
 router.delete('/api/user', (req, res) => {
     if (!authenticateUser(req)) return respondWithError(res, 401, unauthorized)
     const rb = req.body
@@ -99,6 +97,9 @@ router.delete('/api/user', (req, res) => {
         })
         .catch(() => respondWithError(401, unauthorized))
 })
+
+// require('dotenv').config();
+// const { default: axios } = require('axios');
 
 // router.get('/api/github', (req, res) => {
 //     const url = 'https://api.github.com'

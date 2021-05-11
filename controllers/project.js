@@ -12,11 +12,6 @@ const {
 
 
 router.post('/api/project', async (req, res) => {
-    // const authenticated = authenticateUser(req)
-    // if (!authenticated) {
-    //     res.status(403).json(`User doesn't have enough privilege`)
-    //     return
-    // }
     const rb = req.body
     rb.admin_id = rb.user_id // add admin_id property as user_id that created it
     const project = await createProject(rb)
@@ -33,11 +28,6 @@ router.post('/api/project', async (req, res) => {
 })
 
 router.put('/api/project', async (req, res) => {
-    // const authenticated = authenticateUser(req) //must pass in full req to access body and headers
-    // if (!authenticated) {
-    //     res.status(403).json(`User doesn't have enough privilege`)
-    //     return
-    // }
     const rb = req.body
     const projectToEdit = await findProjectToEdit(rb)
 

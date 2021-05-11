@@ -1,7 +1,5 @@
 const db = require("../models");
-const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
-const { authenticateUser, checkPassword, generateNewToken } = require('./authentication')
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 
