@@ -1,4 +1,5 @@
 const db = require("../models");
+const { authenticateUser, checkPassword, generateNewToken } = require('./authentication')
 
 
 
@@ -8,26 +9,20 @@ const createUser = (resolve, reject, rb) => {
         .catch((err) => reject(err))
 }
 
-const loginAttempt = (resolve, reject, rb) => {
-
+const findUser = (resolve, reject, rb) => {
+    db.User.findOne({ username: rb.username })
+        .populate('projects')
+        .then(user => resolve(user))
+        .catch(err => reject(err));
 }
 
-const getUsersData = (req, authenticatedUser) => {
-    return new Promise((resolve, reject) => {
-        db.User.findOne({ _id: authenticatedUser.id })
-            .populate('projects')
-            .then(user => {
-                const token = req.headers.authorization.split(" ")[1];
-                resolve({ user, token });
-            })
-            .catch(() => reject(null));
-    })
+const updateUserData = (resolve, reject, rb) => {
+    db.User.findOneAndUpdate({ _id: rb.user_id }, { data: rb }, { new: true })
+        .then(result => resolve(result))
+        .catch(err => reject(err))
 }
 
 const getUsersUpdatedProjectsArr = (rb) => {
-    //  input: object that has key 'user_id' & 'project_id'
-    // action: find the user object for the user_id
-    // return: an array of all project excluding the 'project_id' from input
     return new Promise((resolve, reject) => {
         db.User.findById(rb.user_id)
             .then(user => {
@@ -39,10 +34,6 @@ const getUsersUpdatedProjectsArr = (rb) => {
 }
 
 const addProjectToUser = (rb, projectId) => {
-    // input 1: object that has key 'user_id'.
-    // input 2: object containing query instructions
-    //  action: find the user matching 'user_id', update user with instructions
-    //  return: updated user object
     return new Promise((resolve, reject) => {
         db.User.findByIdAndUpdate(
             rb.user_id,
@@ -56,7 +47,8 @@ const addProjectToUser = (rb, projectId) => {
 
 module.exports = {
     createUser,
-    getUsersData,
+    findUser,
+    updateUserData,
     getUsersUpdatedProjectsArr,
     addProjectToUser
 }

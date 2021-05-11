@@ -10,9 +10,6 @@ const createProject = (rb) => {
 }
 
 const findProjectToEdit = (rb) => {
-    //  input: object that has key 'project_id'
-    // action: find the project for the id 
-    // return: the project object
     return new Promise((resolve, reject) => {
         db.Project.findById(rb.project_id)
             .then(p => resolve(p))
