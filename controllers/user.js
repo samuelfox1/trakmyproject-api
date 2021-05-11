@@ -16,12 +16,14 @@ const { respondWithError,
     expiredToken,
     serverError,
     notFound
-} = require('../utils/statusCodes')
+} = require('../utils/statusCodes');
+// const { createEntry } = require("../utils/entryHelpers");
 
 // ------------------- POST ----------------------
-router.post('/api/signup', (req, res) => {
-    const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, req.body))
-    creatNewUser
+router.post('/api/user', (req, res) => {
+    const createNewUser = new Promise((resolve, reject) => createUser(resolve, reject, req.body))
+    createNewUser
+        .then(data => console.log(data))
         .then(newUser => res.json({ user: newUser, token: generateNewToken(newUser) }))
         .catch(err => res.status(500).json(err))
 });
@@ -56,7 +58,7 @@ router.put('/api/user/data', (req, res) => {
 })
 
 router.put('/api/user/username', (req, res) => {
-    // if (!authenticateUser(req)) return respondWithError(res, 401, unauthorized)
+    if (!authenticateUser(req)) return respondWithError(res, 401, unauthorized)
     const rb = req.body
     const updated = new Promise((resolve, reject) => updateUsername(resolve, reject, rb))
     updated

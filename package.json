@@ -1,6 +1,6 @@
 {
   "name": "trakmyproject-api",
-  "description": "",
+  "description": "A project Tracking API",
   "version": "1.0.0",
   "main": "server.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "git+https://github.com/samuelfox1/trakmyproject-api.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Samuel Fox",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/samuelfox1/trakmyproject-api/issues"
@@ -24,9 +24,17 @@
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.1.2",
     "mongoose": "^5.12.3",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "body-parser": "^1.15.1",
+    "config": "^1.20.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^2.0.1",
+    "mocha": "^2.4.5"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "SET NODE_ENV=dev && node server.js",
+    "test": "mocha --timeout 10000"
   }
 }
