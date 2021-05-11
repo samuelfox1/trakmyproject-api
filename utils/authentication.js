@@ -16,19 +16,17 @@ const authenticateUser = (req) => {
 
 const checkPassword = (rb, user) => {
     // if a user is found and hashed passwords match, return the user and a new token
-    if (user && bcrypt.compareSync(rb.password, user.password)) return { user: user, token: generateNewToken(user) }
-    return null;
+    if (user && bcrypt.compareSync(rb.password, user.password)) return true
+    return false;
 }
 
 const generateNewToken = (user) => {
     const token = jwt.sign(
-        { username: user.username, id: user.id, },
+        { username: user.username, user_id: user._id, },
         process.env.PRIVATEKEY,
         { expiresIn: "2h", }
     );
     return token
 }
-
-
 
 module.exports = { authenticateUser, checkPassword, generateNewToken }
