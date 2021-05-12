@@ -12,14 +12,14 @@ const {
 const { respondWithError,
     usernameUnavailable,
     unauthorized,
-    forbidden,
     expiredToken,
     serverError,
     notFound
 } = require('../utils/statusCodes')
 
 // ------------------- POST ----------------------
-router.post('/api/signup', (req, res) => {
+router.post('/api/user', (req, res) => {
+    console.log(req.body)
     const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, req.body))
     creatNewUser
         .then(newUser => res.json({ user: newUser, token: generateNewToken(newUser) }))
@@ -27,10 +27,11 @@ router.post('/api/signup', (req, res) => {
 });
 
 router.post('/api/login', (req, res) => {
-    const user = new Promise((resolve, reject) => findUserByUsername(resolve, reject, req.body))
+    const rb = req.body
+    const user = new Promise((resolve, reject) => findUserByUsername(resolve, reject, rb))
     user
         .then(user => {
-            if (checkPassword(req.body, user)) return res.json({ user: user, token: generateNewToken(user) })
+            if (checkPassword(rb, user)) return res.json({ user: user, token: generateNewToken(user) })
             respondWithError(res, 401, unauthorized)
         })
         .catch(() => respondWithError(res, 500, serverError))
@@ -39,7 +40,7 @@ router.post('/api/login', (req, res) => {
 // -------------------- GET ----------------------
 router.get('/api/user', (req, res) => {
     const authorizedUser = authenticateUser(req);
-    if (!authorizedUser) return respondWithError(res, 401, unauthorized)
+    if (!authorizedUser) return respondWithError(res, 401, expiredToken)
     const user = new Promise((resolve, reject) => findUserByUsername(resolve, reject, authorizedUser))
     user
         .then(u => res.json(u))
@@ -48,7 +49,7 @@ router.get('/api/user', (req, res) => {
 
 // -------------------- PUT ----------------------
 router.put('/api/user/data', (req, res) => {
-    if (!authenticateUser(req)) return respondWithError(res, 401, unauthorized)
+    if (!authenticateUser(req)) return respondWithError(res, 401, expiredToken)
     const updateUser = new Promise((resolve, reject) => updateUserData(resolve, reject, req.body))
     updateUser
         .then(data => res.json(data))
@@ -56,7 +57,7 @@ router.put('/api/user/data', (req, res) => {
 })
 
 router.put('/api/user/username', (req, res) => {
-    // if (!authenticateUser(req)) return respondWithError(res, 401, unauthorized)
+    if (!authenticateUser(req)) return respondWithError(res, 401, expiredToken)
     const rb = req.body
     const updated = new Promise((resolve, reject) => updateUsername(resolve, reject, rb))
     updated
@@ -65,9 +66,9 @@ router.put('/api/user/username', (req, res) => {
 })
 
 router.put('/api/user/password', (req, res) => {
-    if (!authenticateUser(req)) return respondWithError(res, 403, unauthorized)
+    if (!authenticateUser(req)) return respondWithError(res, 401, expiredToken)
     const rb = req.body
-    const user = new Promise((resolve, reject) => findUserById(resolve, reject, req.body))
+    const user = new Promise((resolve, reject) => findUserById(resolve, reject, rb))
     user
         .then(user => {
             if (!user) return respondWithError(res, 404, notFound)
@@ -82,7 +83,7 @@ router.put('/api/user/password', (req, res) => {
 
 // ------------------- DELETE --------------------
 router.delete('/api/user', (req, res) => {
-    if (!authenticateUser(req)) return respondWithError(res, 401, unauthorized)
+    if (!authenticateUser(req)) return respondWithError(res, 401, expiredToken)
     const rb = req.body
     const user = new Promise((resolve, reject) => findUserById(resolve, reject, rb))
     user
@@ -93,7 +94,6 @@ router.delete('/api/user', (req, res) => {
             deleted
                 .then(data => res.json({ deleted: data }))
                 .catch(err => respondWithError(res, 500, err))
-
         })
         .catch(() => respondWithError(401, unauthorized))
 })

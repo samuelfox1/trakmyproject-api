@@ -1,75 +1,54 @@
 const db = require("../models");
+const mongoose = require("mongoose");
 
 
-const createProject = (rb) => {
-    return new Promise((resolve, reject) => {
-        db.Project.create(rb)
-            .then(entry => resolve(entry))
-            .catch(() => reject(null))
-    })
+const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
+const message = 'invalid project_id'
+
+const createProject = (resolve, reject, rb) => {
+    db.Project.create(rb)
+        .then(data => resolve(data))
+        .catch(err => reject(err))
 }
 
-const findProjectToEdit = (rb) => {
-    return new Promise((resolve, reject) => {
-        db.Project.findById(rb.project_id)
-            .then(p => resolve(p))
-            .catch(() => reject({ admin: null }))
-    })
+const findProject = (resolve, reject, rb) => {
+    if (!isValidId(rb.project_id)) reject(message)
+    db.Project.findById(rb.project_id)
+        .then(data => resolve(data))
+        .catch(err => reject(err))
 }
 
-const findProjectKeysToUpdate = (rb) => {
-    // find keys attached to req.body and update project with the new values
-    const projectObj = { lastEdited: Date() }
-    if (rb.title) projectObj.title = rb.title
-    if (rb.public) projectObj.public = rb.public
-    if (rb.gitHubRepo) projectObj.gitHubRepo = rb.gitHubRepo
-    if (rb.description) projectObj.description = rb.description
-    return projectObj
+const updateProject = (resolve, reject, rb) => {
+    if (!isValidId(rb.project_id)) reject(message)
+    db.Project.findByIdAndUpdate(rb.project_id, { data: rb.data }, { new: true })
+        .populate("entries")
+        .then(data => resolve(data))
+        .catch(err => reject(err))
 }
 
-const updateProjectData = (rb) => {
-    // input 1: object that has key 'user_id'.
-    // input 2: object containing query instructions
-    //  action: find the user matching 'user_id', update user with instructions
-    //  return: updated user object
-    return new Promise((resolve, reject) => {
-        const updatedProjectObj = findProjectKeysToUpdate(rb)
-        db.Project.findByIdAndUpdate(rb.project_id, updatedProjectObj, { new: true })
-            .populate("entries")
-            .then(data => resolve(data))
-            .catch(() => reject(null))
-    })
+const deleteProject = (resolve, reject, rb) => {
+    if (!isValidId(rb.project_id)) reject(message)
+    db.Project.findByIdAndDelete(rb.project_id)
+        .then(data => resolve(data))
+        .catch(err => reject(err))
 }
 
-const addEntryToProject = (rb, entryId) => {
-    return new Promise((resolve, reject) => {
-        db.Project.findByIdAndUpdate(
-            rb.project_id,
-            { $addToSet: { entries: entryId } },
-            { new: true }
-        )
-            .populate("entries")
-            .then(data => resolve(data))
-            .catch(() => reject(null))
-    })
-}
-
-const deleteProject = (rb) => {
-    //  input: object that has key 'project_id'
-    // action: find the project matching 'project_id'
-    // return: true or false
-    return new Promise((resolve, reject) => {
-        db.Project.findByIdAndDelete(rb.project_id)
-            .then(() => resolve(true))
-            .catch(() => reject(null))
-    })
-}
+// const addEntryToProject = (rb, entryId) => {
+//     return new Promise((resolve, reject) => {
+//         db.Project.findByIdAndUpdate(
+//             rb.project_id,
+//             { $addToSet: { entries: entryId } },
+//             { new: true }
+//         )
+//             .populate("entries")
+//             .then(data => resolve(data))
+//             .catch(err => reject(err))
+//     })
+// }
 
 module.exports = {
     createProject,
-    findProjectToEdit,
-    findProjectKeysToUpdate,
-    updateProjectData,
-    addEntryToProject,
+    findProject,
+    updateProject,
     deleteProject
 }

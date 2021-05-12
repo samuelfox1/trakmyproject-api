@@ -18,7 +18,7 @@ app.use(cors());
 
 // Database
 const mongoose = require("mongoose");
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/trakmyproject", { // connect to database
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/trakmyproject", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
@@ -36,7 +36,6 @@ app.use(projectRoutes)
 // Entry Routes 
 const entryRoutes = require("./controllers/entry")
 app.use(entryRoutes)
-
 
 // Server
 const PORT = process.env.PORT || 8080;

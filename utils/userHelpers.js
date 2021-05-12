@@ -1,7 +1,9 @@
 const db = require("../models");
 const mongoose = require("mongoose");
 
+
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
+const message = 'invalid user_id'
 
 const createUser = (resolve, reject, rb) => {
     db.User.create(rb)
@@ -17,7 +19,7 @@ const findUserByUsername = (resolve, reject, rb) => {
 }
 
 const findUserById = (resolve, reject, rb) => {
-    if (!isValidId(rb.user_id)) reject('invalid id')
+    if (!isValidId(rb.user_id)) reject(message)
     db.User.findById(rb.user_id)
         .populate('projects')
         .then(user => resolve(user))
@@ -25,21 +27,21 @@ const findUserById = (resolve, reject, rb) => {
 }
 
 const updateUserData = (resolve, reject, rb) => {
-    if (!isValidId(rb.user_id)) reject('invalid id')
+    if (!isValidId(rb.user_id)) reject(message)
     db.User.findByIdAndUpdate(rb.user_id, { data: rb }, { new: true })
         .then(result => resolve(result))
         .catch(err => reject(err))
 }
 
 const updateUsername = (resolve, reject, rb) => {
-    if (!isValidId(rb.user_id)) reject('invalid id')
+    if (!isValidId(rb.user_id)) reject(message)
     db.User.findByIdAndUpdate(rb.user_id, { username: rb.username }, { new: true })
         .then(result => resolve(result))
         .catch(err => reject(err))
 }
 
 const updatePassword = async (resolve, reject, rb) => {
-    if (!isValidId(rb.user_id)) reject('invalid id')
+    if (!isValidId(rb.user_id)) reject(message)
     // setup query this way, save() method accesses middleware to encrypt new password
     const doc = await db.User.findById(rb.user_id)
     if (!doc) resolve('document not found')
@@ -50,34 +52,33 @@ const updatePassword = async (resolve, reject, rb) => {
 }
 
 const deleteUser = (resolve, reject, rb) => {
-    if (!isValidId(rb.user_id)) reject('invalid id')
+    if (!isValidId(rb.user_id)) reject(message)
     db.User.findByIdAndDelete(rb.user_id)
         .then(data => resolve(data))
         .catch(err => reject(err))
 }
 
-const getUsersUpdatedProjectsArr = (rb) => {
-    return new Promise((resolve, reject) => {
-        if (!isValidId(rb.user_id)) reject('invalid id')
-        db.User.findById(rb.user_id)
-            .then(user => {
-                const updatedProjectsArray = user.projects.filter(project => project._id != rb.project_id)
-                resolve(updatedProjectsArray)
-            })
-            .catch(() => reject(null))
-    })
+const addProjectToUser = (resolve, reject, rb, projectId) => {
+    if (!isValidId(rb.user_id)) reject(message)
+    db.User.findByIdAndUpdate(
+        rb.user_id,
+        { $addToSet: { projects: projectId } },
+        { new: true }
+    )
+        .populate("projects")
+        .then(updatedUser => resolve(updatedUser))
+        .catch((err) => reject(err))
 }
 
-const addProjectToUser = (rb, projectId) => {
-    return new Promise((resolve, reject) => {
-        db.User.findByIdAndUpdate(
-            rb.user_id,
-            { $addToSet: { projects: projectId } },
-            { new: true })
-            .populate("projects")
-            .then(updatedUser => resolve(updatedUser))
-            .catch(() => reject(null))
-    })
+const deleteProjectFromUser = (resolve, reject, rb) => {
+    db.User.findByIdAndUpdate(
+        rb.user_id,
+        { $pull: { projects: rb.project_id } },
+        { new: true }
+    )
+        .populate("projects")
+        .then(updatedUser => resolve(updatedUser))
+        .catch((err) => reject(err))
 }
 
 module.exports = {
@@ -88,6 +89,6 @@ module.exports = {
     updateUsername,
     updatePassword,
     deleteUser,
-    getUsersUpdatedProjectsArr,
-    addProjectToUser
+    addProjectToUser,
+    deleteProjectFromUser
 }
