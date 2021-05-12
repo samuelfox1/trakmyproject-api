@@ -19,7 +19,6 @@ const { respondWithError,
 
 // ------------------- POST ----------------------
 router.post('/api/user', (req, res) => {
-    console.log(req.body)
     const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, req.body))
     creatNewUser
         .then(newUser => res.json({ user: newUser, token: generateNewToken(newUser) }))

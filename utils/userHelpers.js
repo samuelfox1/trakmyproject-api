@@ -7,8 +7,8 @@ const message = 'invalid user_id'
 
 const createUser = (resolve, reject, rb) => {
     db.User.create(rb)
-        .then(newUser => resolve(newUser))
-        .catch((err) => reject(err))
+        .then(data => resolve(data))//resolve(newUser))
+        .catch(err => reject(err))
 }
 
 const findUserByUsername = (resolve, reject, rb) => {
