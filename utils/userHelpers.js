@@ -27,6 +27,7 @@ const findUserById = (resolve, reject, rb) => {
 }
 
 const updateUserData = (resolve, reject, rb) => {
+    console.log(isValidId(rb.user_id), rb)
     if (!isValidId(rb.user_id)) reject(message)
     db.User.findByIdAndUpdate(rb.user_id, { data: rb }, { new: true })
         .then(result => resolve(result))

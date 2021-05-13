@@ -24,7 +24,7 @@ const checkPassword = (rb, user) => {
 
 const generateNewToken = (user) => {
     const token = sign(
-        { username: 'username', id: '_id' },
+        { username: user.username, user_id: user._id },
         SECRET,
         { expiresIn: "2h", });
     return token
