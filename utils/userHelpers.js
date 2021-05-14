@@ -11,6 +11,13 @@ const createUser = (resolve, reject, rb) => {
         .catch(err => reject(err))
 }
 
+const findUserByEmail = (resolve, reject, rb) => {
+    console.log(rb)
+    db.User.findOne({ 'data.email': rb.email })
+        .then(user => resolve(user))
+        .catch(err => reject(err));
+}
+
 const findUserByUsername = (resolve, reject, rb) => {
     db.User.findOne({ username: rb.username })
         .populate('projects')
@@ -84,6 +91,7 @@ const deleteProjectFromUser = (resolve, reject, rb) => {
 
 module.exports = {
     createUser,
+    findUserByEmail,
     findUserByUsername,
     findUserById,
     updateUserData,

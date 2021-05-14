@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { authenticateUser, checkPassword, generateNewToken } = require('../utils/authentication')
 const {
     createUser,
+    findUserByEmail,
     findUserByUsername,
     findUserById,
     updateUserData,
@@ -18,6 +19,15 @@ const { respondWithError,
 } = require('../utils/statusCodes')
 
 // ------------------- POST ----------------------
+
+// check available email on signup
+router.post('/api/email', (req, res) => {
+    const user = new Promise((resolve, reject) => findUserByEmail(resolve, reject, req.body))
+    user
+        .then(user => !user ? res.json(true) : res.json(false))
+        .catch(() => res.json('noUser'))
+})
+
 // check available username on signup
 router.post('/api/username', (req, res) => {
     const user = new Promise((resolve, reject) => findUserByUsername(resolve, reject, req.body))
@@ -28,9 +38,22 @@ router.post('/api/username', (req, res) => {
 
 // create new user
 router.post('/api/user', (req, res) => {
+    console.log(req.body)
     const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, req.body))
     creatNewUser
-        .then(newUser => res.json({ user: newUser, token: generateNewToken(newUser) }))
+        .then(newUser => {
+            const formatted = {
+                id: newUser._id,
+                username: newUser.username,
+                dateCreated: newUser.dateCreated,
+                firsName: newUser.data.firsName,
+                lastName: newUser.data.lastName,
+                email: newUser.data.email,
+                projects: newUser.projects,
+
+            }
+            res.json({ user: formatted, token: generateNewToken(newUser) })
+        })
         .catch(err => res.status(500).json(err))
 });
 
