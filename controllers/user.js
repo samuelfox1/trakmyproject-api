@@ -38,21 +38,12 @@ router.post('/api/username', (req, res) => {
 
 // create new user
 router.post('/api/user', (req, res) => {
-    console.log(req.body)
     const creatNewUser = new Promise((resolve, reject) => createUser(resolve, reject, req.body))
     creatNewUser
-        .then(newUser => {
-            const formatted = {
-                id: newUser._id,
-                username: newUser.username,
-                dateCreated: newUser.dateCreated,
-                firsName: newUser.data.firsName,
-                lastName: newUser.data.lastName,
-                email: newUser.data.email,
-                projects: newUser.projects,
-
-            }
-            res.json({ user: formatted, token: generateNewToken(newUser) })
+        .then(user => {
+            user.password = ''
+            console.log(user)
+            res.json({ user: user, token: generateNewToken(user) })
         })
         .catch(err => res.status(500).json(err))
 });
@@ -63,7 +54,10 @@ router.post('/api/login', (req, res) => {
     const user = new Promise((resolve, reject) => findUserByUsername(resolve, reject, rb))
     user
         .then(user => {
-            if (checkPassword(rb, user)) return res.json({ user: user, token: generateNewToken(user) })
+            if (checkPassword(rb, user)) {
+                user.password = ''
+                return res.json({ user: user, token: generateNewToken(user) })
+            }
             respondWithError(res, 401, unauthorized)
         })
         .catch(() => respondWithError(res, 500, serverError))
@@ -74,11 +68,13 @@ router.post('/api/login', (req, res) => {
 //get logged in user data
 router.get('/api/user', (req, res) => {
     const authorizedUser = authenticateUser(req);
-    console.log(authorizedUser)
     if (!authorizedUser) return respondWithError(res, 401, expiredToken)
     const user = new Promise((resolve, reject) => findUserByUsername(resolve, reject, authorizedUser))
     user
-        .then(u => res.json(u))
+        .then(user => {
+            user.password = ''
+            res.json({ user: user, token: generateNewToken(user) })
+        })
         .catch(err => res.status(500).json(err))
 });
 
