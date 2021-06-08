@@ -3,6 +3,7 @@ const express = require("express");
 const logger = require("morgan");
 const app = express();
 const cors = require("cors");
+const PORT = process.env.PORT || 8080;
 
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
@@ -22,7 +23,7 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/trakmyproject",
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
-    useCreateIndex: true // resolve 'collection.ensureIndex is deprecated. Use createIndexes instead. error message'
+    useCreateIndex: true // resolve 'collection.ensureIndex is deprecated. Use createIndexes instead.' error message
 });
 
 // User Routes
@@ -38,7 +39,4 @@ const entryRoutes = require("./controllers/entry")
 app.use(entryRoutes)
 
 // Server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`http://localhost:${PORT}`));

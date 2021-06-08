@@ -18,18 +18,16 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Project"
     }],
-    data: {
-        profilePic: {
-            type: String,
-            default: "https://i.imgur.com/4DDqtypt.jpg",
-        },
-        firstName: { type: String },
-        lastName: { type: String },
-        email: {
-            type: String,
-            required: true,
-            unique: true,
-        },
+    profilePic: {
+        type: String,
+        default: "https://i.imgur.com/4DDqtypt.jpg",
+    },
+    firstName: { type: String },
+    lastName: { type: String },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
     },
     // friends: [{
     //     type: Schema.Types.ObjectId,
