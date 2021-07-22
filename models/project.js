@@ -2,12 +2,12 @@ const mongoose = require("mongoose")
 const { Schema } = mongoose
 
 const ProjectSchema = new Schema({
-    data: {
-        title: { type: String, required: true, },
-        gitHubRepo: { type: String },
-        description: { type: String },
-        public: { type: Boolean },
-    },
+
+    title: { type: String, required: true, },
+    gitHubRepo: { type: String },
+    description: { type: String },
+    public: { type: Boolean },
+
     admin_id: { // owner of the project
         type: Schema.Types.ObjectId,
         ref: "User"
