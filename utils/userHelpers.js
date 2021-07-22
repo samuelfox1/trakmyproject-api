@@ -88,9 +88,9 @@ const updatePassword = async (user_id, newPassword) => {
 //         .catch(err => reject(err))
 // }
 
-const addProjectToUser = async (rb, projectId) => {
+const addProjectToUser = (rb, projectId) => {
     // if (!isValidId(rb.user_id)) reject(message)
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
             const updatedUser = await db.User.findByIdAndUpdate(
                 rb.user_id,
