@@ -17,7 +17,6 @@ const authenticateUser = (req) => {
 };
 
 const checkPassword = (currentInput, savedPassword) => {
-    console.log(currentInput, savedPassword)
     // if a user is found and hashed passwords match, return the user and a new token
     if (bcrypt.compareSync(currentInput, savedPassword)) return true
     return false;

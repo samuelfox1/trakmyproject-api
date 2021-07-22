@@ -16,23 +16,24 @@ const { respondWithError,
     notFound
 } = require('../utils/statusCodes')
 
+const projectRoute = '/api/project'
+
 // ----------------------- POST ----------------------
-router.post('/api/project', (req, res) => {
+router.post(projectRoute, async (req, res) => {
     const rb = req.body
     rb.admin_id = rb.user_id // add admin_id property as user_id that created it
-    const createProject = new Promise((resolve, reject) => createProject(resolve, reject, rb))
-    createProject
-        .then(project => {
-            const updated = new Promise((resolve, reject) => addProjectToUser(resolve, reject, rb, project._id))
-            updated
-                .then(() => res.json(project))
-                .catch(() => respondWithError(res, 500, 'error, user data not updated'))
-        })
-        .catch(() => respondWithError(res, 500, 'error, project not created'))
+
+    try {
+        const createdProject = await createProject(rb)
+        if (!createdProject._id) respondWithError(res, 500, 'project not created')
+        const updatedUsersProjects = await addProjectToUser(rb, createdProject._id)
+        if (updatedUsersProjects) res.json(updatedUsersProjects)
+        else respondWithError(res, 500, 'error, user data not updated')
+    } catch (err) { respondWithError(res, 500, `POST Request catch block of ${projectRoute}`) }
 })
 
 // ----------------------- GET -----------------------
-router.get('/api/project', (req, res) => {
+router.get(projectRoute, (req, res) => {
     if (!authenticateUser(req)) return respondWithError(res, 401, expiredToken)
     const rb = req.body
     const findAProject = new Promise((resolve, reject) => findProject(resolve, reject, rb))
@@ -42,7 +43,7 @@ router.get('/api/project', (req, res) => {
 })
 
 // ----------------------- PUT -----------------------
-router.put('/api/project', (req, res) => {
+router.put(projectRoute, (req, res) => {
     if (!authenticateUser(req)) return respondWithError(res, 401, expiredToken)
     const rb = req.body
     const search = new Promise((resolve, reject) => findProject(resolve, reject, rb))
@@ -58,7 +59,7 @@ router.put('/api/project', (req, res) => {
 })
 
 // ---------------------- DELETE ---------------------
-router.delete('/api/project', (req, res) => {
+router.delete(projectRoute, (req, res) => {
     if (!authenticateUser(req)) return respondWithError(res, 401, expiredToken)
     const rb = req.body
     const projectToDelete = new Promise((resolve, reject) => findProject(resolve, reject, rb))

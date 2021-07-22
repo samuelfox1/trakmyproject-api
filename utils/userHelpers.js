@@ -88,16 +88,20 @@ const updatePassword = async (user_id, newPassword) => {
 //         .catch(err => reject(err))
 // }
 
-const addProjectToUser = (resolve, reject, rb, projectId) => {
-    if (!isValidId(rb.user_id)) reject(message)
-    db.User.findByIdAndUpdate(
-        rb.user_id,
-        { $addToSet: { projects: projectId } },
-        { new: true }
-    )
-        .populate("projects")
-        .then(updatedUser => resolve(updatedUser))
-        .catch((err) => reject(err))
+const addProjectToUser = async (rb, projectId) => {
+    // if (!isValidId(rb.user_id)) reject(message)
+    return new Promise((resolve, reject) => {
+        try {
+            const updatedUser = await db.User.findByIdAndUpdate(
+                rb.user_id,
+                { $addToSet: { projects: projectId } },
+                { new: true }
+            ).populate("projects")
+
+            if (updatedUser) resolve(updatedUser)
+            else throw new Error({ error: err, message: 'addProjectToUser() failed' })
+        } catch (err) { throw new Error({ error: err, message: 'addProjectToUser() failed' }) }
+    })
 }
 
 const deleteProjectFromUser = (resolve, reject, rb) => {

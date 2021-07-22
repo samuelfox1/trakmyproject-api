@@ -5,10 +5,14 @@ const mongoose = require("mongoose");
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
 const message = 'invalid project_id'
 
-const createProject = (resolve, reject, rb) => {
-    db.Project.create(rb)
-        .then(data => resolve(data))
-        .catch(err => reject(err))
+const createProject = (rb) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.Project.create(rb)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+        } catch (err) { reject(err) }
+    })
 }
 
 const findProject = (resolve, reject, rb) => {
