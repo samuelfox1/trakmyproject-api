@@ -1,50 +1,63 @@
 const db = require("../models");
-const mongoose = require("mongoose");
 
+const handleError = (err, message) => { throw new Error({ error: err, message: message }) }
 
-const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
-const message = 'invalid project_id'
-
-const createProject = (rb) => {
-    return new Promise((resolve, reject) => {
+const createProject = (body) => {
+    return new Promise(resolve => {
         try {
-            db.Project.create(rb)
+
+            db.Project.create(body)
                 .then(data => resolve(data))
-                .catch(err => reject(err))
-        } catch (err) { reject(err) }
+                .catch(err => handleError(err, 'failed to create project'))
+
+        } catch (err) { handleError(err, 'createProject() failed') }
     })
 }
 
-const findProject = (resolve, reject, rb) => {
-    if (!isValidId(rb.project_id)) reject(message)
-    db.Project.findById(rb.project_id)
-        .then(data => resolve(data))
-        .catch(err => reject(err))
+const findProjectById = (id) => {
+    return new Promise(resolve => {
+        try {
+
+            db.Project.findById(id)
+                .then(data => resolve(data))
+                .catch(err => handleError(err, 'failed to find project my id'))
+
+        } catch (err) { handleError(err, 'findProjectById() failed') }
+    })
 }
 
-const updateProject = (resolve, reject, rb) => {
-    if (!isValidId(rb.project_id)) reject(message)
-    db.Project.findByIdAndUpdate(rb.project_id, { data: rb.data }, { new: true })
-        .populate("entries")
-        .then(data => resolve(data))
-        .catch(err => reject(err))
+const updateProject = (id, data) => {
+    return new Promise(resolve => {
+        try {
+
+            db.Project.findByIdAndUpdate(id, { data: data }, { new: true }).populate("posts")
+                .then(data => resolve(data))
+                .catch(err => handleError(err, 'project to update not found'))
+
+        } catch (err) { handleError(err, 'updateProject() failed') }
+    })
 }
 
-const deleteProject = (resolve, reject, rb) => {
-    if (!isValidId(rb.project_id)) reject(message)
-    db.Project.findByIdAndDelete(rb.project_id)
-        .then(data => resolve(data))
-        .catch(err => reject(err))
+const deleteProject = (id) => {
+    return new Promise(resolve => {
+        try {
+
+            db.Project.findByIdAndDelete(id)
+                .then(data => resolve(data))
+                .catch(err => handleError(err, 'project to delete not found'))
+
+        } catch (err) { handleError(err, 'deleteProject() failed') }
+    })
 }
 
-// const addEntryToProject = (rb, entryId) => {
+// const addPostToProject = (rb, postId) => {
 //     return new Promise((resolve, reject) => {
 //         db.Project.findByIdAndUpdate(
 //             rb.project_id,
-//             { $addToSet: { entries: entryId } },
+//             { $addToSet: { posts: postId } },
 //             { new: true }
 //         )
-//             .populate("entries")
+//             .populate("posts")
 //             .then(data => resolve(data))
 //             .catch(err => reject(err))
 //     })
@@ -52,7 +65,7 @@ const deleteProject = (resolve, reject, rb) => {
 
 module.exports = {
     createProject,
-    findProject,
+    findProjectById,
     updateProject,
     deleteProject
 }
