@@ -11,14 +11,6 @@ const {
     secureUserData
 } = require('../utils/userHelpers')
 
-const routeUser = `/api/user`
-const routeUserEmail = `${routeUser}/email`
-const routeUserUsername = `${routeUser}`
-const routeUserLogin = `${routeUser}/login`
-const routeUserData = `${routeUser}/data`
-const routeUserPassword = `${routeUser}/password`
-
-
 // ------------------- POST ----------------------
 
 // create new user account
@@ -59,7 +51,7 @@ router.post('/username', async (req, res) => {
 })
 
 
-router.post(routeUserLogin, async (req, res) => {
+router.post('/login', async (req, res) => {
     try {
         const { password, username } = req.body
         const userToLogin = await findUserByUsername(username)
@@ -98,7 +90,7 @@ router.get('/', async (req, res) => {
 // -------------------- PUT ----------------------
 
 //update logged in user's data
-router.put(routeUserData, async (req, res) => {
+router.put('/data', async (req, res) => {
 
     try {
         if (!verifyAuthorizationToken(req)) return respondWithError(res, 401, invalidToken)
@@ -115,7 +107,7 @@ router.put(routeUserData, async (req, res) => {
 })
 
 //update logged in user's username
-router.put(routeUserUsername, async (req, res) => {
+router.put('/username', async (req, res) => {
     try {
         if (!verifyAuthorizationToken(req)) return res.status(401).send('unauthorized')
         const { user_id, username } = req.body
@@ -130,7 +122,7 @@ router.put(routeUserUsername, async (req, res) => {
 })
 
 //update logged in user's password
-router.put(routeUserPassword, async (req, res) => {
+router.put('/password', async (req, res) => {
     try {
         if (!verifyAuthorizationToken(req)) return res.status(401).send('unauthorized')
         const { user_id, password, newPassword } = req.body
