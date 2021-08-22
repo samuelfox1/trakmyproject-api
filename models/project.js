@@ -16,10 +16,10 @@ const ProjectSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     }],
-    entries: { // entries for each project
+    posts: { // posts for each project
         type: Array,
         default: [],
-        ref: "Entry"
+        ref: "Post"
     },
     comments: {
         type: Array,
@@ -35,5 +35,4 @@ const ProjectSchema = new Schema({
     }
 });
 
-const Project = mongoose.model("Project", ProjectSchema)
-module.exports = Project;
+module.exports = mongoose.model("Project", ProjectSchema)

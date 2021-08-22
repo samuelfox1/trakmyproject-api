@@ -1,14 +1,15 @@
-// Set up the Express app
 const express = require("express");
 const logger = require("morgan");
-const app = express();
 const cors = require("cors");
+require('dotenv').config()
+
 const PORT = process.env.PORT || 8080;
 
+const app = express();
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", '*');
     res.header("Access-Control-Allow-Credentials", true);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -17,7 +18,6 @@ app.use(function (req, res, next) {
 });
 app.use(cors());
 
-// Database
 const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/trakmyproject", {
     useNewUrlParser: true,
@@ -26,17 +26,6 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/trakmyproject",
     useCreateIndex: true // resolve 'collection.ensureIndex is deprecated. Use createIndexes instead.' error message
 });
 
-// User Routes
-const userRoutes = require("./controllers/user");
-app.use(userRoutes);
+app.use('/api', require('./controllers'))
 
-// Project Routes
-const projectRoutes = require("./controllers/project");
-app.use(projectRoutes)
-
-// Entry Routes 
-const entryRoutes = require("./controllers/entry")
-app.use(entryRoutes)
-
-// Server
 app.listen(PORT, () => console.log(`http://localhost:${PORT}`));

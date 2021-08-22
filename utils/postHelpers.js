@@ -1,30 +1,30 @@
-const db = require("../models");
+const { Post } = require("../models");
 
-const createEntry = (rb) => {
+const createPost = (rb) => {
     return new Promise((resolve, reject) => {
-        db.Entry.create(rb)
-            .then(entry => resolve(entry))
+        Post.create(rb)
+            .then(post => resolve(post))
             .catch(() => reject(null))
     })
 }
 
-const findEntryToEdit = (rb) => {
+const findPostToEdit = (rb) => {
     //  input: object that has key 'project_id'
     // action: find the project for the id 
     // return: the project object
     return new Promise((resolve, reject) => {
-        db.Entry.findById(rb.entry_id)
+        Post.findById(rb.post_id)
             .then(p => resolve(p))
             .catch(() => reject({ admin: null }))
     })
 }
 
-const findEntryKeysToUpdate = (rb) => {
+const findPostKeysToUpdate = (rb) => {
     // find keys attached to req.body and update project with the new values
-    const entryObj = { lastEdited: Date() }
-    if (rb.title) entryObj.title = rb.title
-    if (rb.body) entryObj.body = rb.body
-    return entryObj
+    const postObj = { lastEdited: Date() }
+    if (rb.title) postObj.title = rb.title
+    if (rb.body) postObj.body = rb.body
+    return postObj
 }
 
 // const addImage
@@ -34,6 +34,6 @@ const findEntryKeysToUpdate = (rb) => {
 
 
 module.exports = {
-    createEntry,
-    findEntryToEdit
+    createPost,
+    findPostToEdit
 }
