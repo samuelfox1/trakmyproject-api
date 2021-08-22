@@ -4,7 +4,7 @@ require("dotenv").config()
 
 const SECRET = process.env.PRIVATEKEY
 
-const authenticateUser = (req) => {
+const verifyAuthorizationToken = (req) => {
     /* expected header sent with get request
     headers: {
         authorization: `Bearer: ${token}`
@@ -16,11 +16,7 @@ const authenticateUser = (req) => {
     return data ? data : null;
 };
 
-const checkPassword = (currentInput, savedPassword) => {
-    // if a user is found and hashed passwords match, return the user and a new token
-    if (bcrypt.compareSync(currentInput, savedPassword)) return true
-    return false;
-}
+const verifyUserPassword = (currentInput, savedPassword) => bcrypt.compareSync(currentInput, savedPassword) ? true : false;
 
 const generateNewToken = (user) => {
     const token = sign(
@@ -29,4 +25,4 @@ const generateNewToken = (user) => {
         { expiresIn: "2h", });
     return token
 }
-module.exports = { authenticateUser, checkPassword, generateNewToken }
+module.exports = { verifyAuthorizationToken, verifyUserPassword, generateNewToken }
