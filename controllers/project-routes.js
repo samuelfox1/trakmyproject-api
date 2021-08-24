@@ -7,22 +7,18 @@ const {
     updateProject,
     deleteProject,
 } = require('../utils/projectHelpers')
-const { respondWithError,
-    expiredToken,
-    forbidden,
-} = require('../utils/statusCodes')
-
-const projectRoute = '/api/project'
+const { respondWithError, expiredToken, forbidden, } = require('../utils/statusCodes');
+const { find } = require("../models/User");
 
 
 // ----------------------- POST ----------------------
-router.post(projectRoute, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const { body } = req
         body.admin_id = body.user_id // add admin_id property as user_id that created it
-        const createdProject = await createProject(body)
-        const updatedUsersProjects = await addProjectToUser(body, createdProject._id)
-        res.json(updatedUsersProjects)
+        const newProject = await createProject(body)
+        const updateUsersProjects = await addProjectToUser(body, newProject._id)
+        res.json(updateUsersProjects)
     } catch (err) {
         res.status(500).json(error)
     }
@@ -30,12 +26,28 @@ router.post(projectRoute, async (req, res) => {
 
 
 // ----------------------- GET -----------------------
-router.get(projectRoute, async (req, res) => {
+
+// find all projects for the admin
+router.get('/', async (req, res) => {
     try {
         if (!verifyAuthorizationToken(req)) return res.status(401).send('unauthorized')
-        const { project_id } = req.body
-        const projectFound = await findProjectById(project_id)
-        res.json(projectFound)
+
+        const { _id } = req.body
+        const foundProject = await find({ admin_id: _id })
+        res.json(foundProject)
+    } catch (error) {
+        res.status(500).json(error)
+    }
+})
+
+// find one project by id
+router.get('/:id', async (req, res) => {
+    try {
+        if (!verifyAuthorizationToken(req)) return res.status(401).send('unauthorized')
+
+        const { id } = req.params
+        const foundProject = await findProjectById(id)
+        res.json(foundProject)
     } catch (error) {
         res.status(500).json(error)
     }
@@ -43,13 +55,14 @@ router.get(projectRoute, async (req, res) => {
 
 
 // ----------------------- PUT -----------------------
-router.put(projectRoute, async (req, res) => {
+router.put('/', async (req, res) => {
     try {
         if (!verifyAuthorizationToken(req)) return res.status(401).send('unauthorized')
+
         const { body } = req
         const { user_id, project_id, data } = body
-        const projectFound = await findProjectById(project_id)
-        if (projectFound.admin_id !== user_id) return res.status(403).send('forbidden')
+        const foundProject = await findProjectById(project_id)
+        if (foundProject.admin_id !== user_id) return res.status(403).send('forbidden')
         const updatedProject = await updateProject(project_id, data)
         res.json(updatedProject)
     } catch (error) {
@@ -59,9 +72,10 @@ router.put(projectRoute, async (req, res) => {
 
 
 // ---------------------- DELETE ---------------------
-router.delete(projectRoute, async (req, res) => {
+router.delete('/', async (req, res) => {
     try {
         if (!verifyAuthorizationToken(req)) return res.status(401).send('unauthorized')
+
         const { user_id, project_id } = req.body
         const projectToDelete = await findProjectById(project_id)
         if (projectToDelete.admin_id !== user_id) return res.status(403).send('forbidden')
