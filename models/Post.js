@@ -6,12 +6,16 @@ const PostSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Project"
     },
-    admin_id: { // owner of the project
+    admin_id: {
         type: Schema.Types.ObjectId,
         ref: "User"
     },
-    title: { type: String },
-    body: { type: String },
+    title: {
+        type: String
+    },
+    body: {
+        type: String
+    },
     images: {
         type: Array,
         default: []
