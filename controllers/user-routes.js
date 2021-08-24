@@ -32,8 +32,8 @@ router.post('/', async (req, res) => {
 router.post('/email', async (req, res) => {
     try {
         const { email } = req.body
-        const userEmailFound = await findUserByEmail(email)
-        res.json(userEmailFound ? true : false)
+        const emailFound = await findUserByEmail(email)
+        res.json(emailFound ? true : false)
     } catch (error) {
         res.status(500).json(error)
     }
