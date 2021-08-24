@@ -3,7 +3,7 @@ const logger = require("morgan");
 const cors = require("cors");
 require('dotenv').config()
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3001;
 
 const app = express();
 app.use(logger("dev"));
@@ -27,5 +27,9 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/trakmyproject",
 });
 
 app.use('/api', require('./controllers'))
+
+app.get('/', (req, res) => {
+    res.json({ serverIs: 'running', port: PORT })
+})
 
 app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
