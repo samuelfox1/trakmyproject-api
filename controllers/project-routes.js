@@ -15,11 +15,10 @@ const { find } = require("../models/User");
 router.post('/', async (req, res) => {
     try {
         const { body } = req
-        body.admin_id = body.user_id // add admin_id property as user_id that created it
         const newProject = await createProject(body)
         const updateUsersProjects = await addProjectToUser(body, newProject._id)
         res.json(updateUsersProjects)
-    } catch (err) {
+    } catch (error) {
         res.status(500).json(error)
     }
 })
