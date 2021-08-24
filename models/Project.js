@@ -12,9 +12,10 @@ const ProjectSchema = new Schema({
     description: {
         type: String
     },
-    public: {
+    private: {
         type: Boolean,
-        required: true
+        required: true,
+        defaultValue: true
     },
     admin_id: {
         type: Schema.Types.ObjectId,
