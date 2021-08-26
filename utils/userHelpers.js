@@ -30,8 +30,7 @@ const findUserByUsername = (username) => {
     return new Promise(resolve => {
         try {
 
-            User.findOne({ username: username })
-                .populate('projects')
+            User.findOne({ username: username }).populate('projects')
                 .then(user => resolve(user))
                 .catch(err => handleError(err, 'bad inputs'));
 
@@ -87,12 +86,12 @@ const updatePassword = (user_id, newPassword) => {
 //         .catch(err => reject(err))
 // }
 
-const addProjectToUser = (rb, projectId) => {
+const addProjectToUser = (_id, projectId) => {
     return new Promise(resolve => {
         try {
 
             User.findByIdAndUpdate(
-                rb.user_id,
+                _id,
                 { $addToSet: { projects: projectId } },
                 { new: true }
             ).populate("projects")

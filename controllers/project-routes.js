@@ -15,8 +15,9 @@ const { find } = require("../models/User");
 router.post('/', async (req, res) => {
     try {
         const { body } = req
+        console.log(body)
         const newProject = await createProject(body)
-        const updateUsersProjects = await addProjectToUser(body, newProject._id)
+        const updateUsersProjects = await addProjectToUser(body.admin_id, newProject._id)
         res.json(updateUsersProjects)
     } catch (error) {
         res.status(500).json(error)
