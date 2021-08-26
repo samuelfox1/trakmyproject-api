@@ -27,6 +27,7 @@
     "morgan": "^1.10.0"
   },
   "scripts": {
-    "start": "nodemon --trace-warnings server.js"
+    "start": "node index.js",
+    "develop": "nodemon --trace-warnings server.js"
   }
 }
